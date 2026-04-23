@@ -26,54 +26,86 @@
 
         .hidden { display: none !important; }
 
-        /* --- 20-Second Cinematic Animation --- */
+        /* --- 4K CINEMATIC ANIMATION & LOADER --- */
         #cinematic-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: black;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(circle, #050505 0%, #000 100%);
             z-index: 10000;
             display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
 
         #hero-butterfly {
-            position: absolute;
-            font-size: 50px;
-            filter: drop-shadow(0 0 25px var(--primary));
+            font-size: 120px;
+            filter: drop-shadow(0 0 20px var(--primary)) drop-shadow(0 0 40px var(--primary));
             user-select: none;
         }
 
-        @keyframes chaos-flight {
-            0% { top: 100%; left: 50%; transform: scale(1) rotate(0deg); }
-            15% { top: 20%; left: 80%; transform: scale(1.2) rotate(45deg); }
-            30% { top: 70%; left: 10%; transform: scale(0.8) rotate(-30deg); }
-            50% { top: 10%; left: 50%; transform: scale(1.5) rotate(10deg); }
-            70% { top: 80%; left: 90%; transform: scale(1.1) rotate(60deg); }
-            90% { top: 50%; left: 50%; transform: scale(2) rotate(0deg); opacity: 1; }
-            100% { top: 50%; left: 50%; transform: scale(45) rotate(0deg); opacity: 0; }
+        @keyframes monarch-flow {
+            0% { transform: scale(1) translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            50% { transform: scale(1.5) translateY(-30px) rotate(5deg); filter: drop-shadow(0 0 60px var(--primary)); }
+            100% { transform: scale(50) translateY(0) rotate(0deg); opacity: 0; }
         }
 
-        .executing-animation { animation: chaos-flight 20s ease-in-out forwards; }
+        .executing-animation { 
+            animation: monarch-flow 15s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+        }
 
-        /* --- UI Styling --- */
+        .loading-wrapper {
+            position: absolute;
+            bottom: 12%;
+            text-align: center;
+            width: 100%;
+        }
+
+        #load-count {
+            font-family: monospace;
+            font-size: 28px;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .progress-track {
+            width: 280px;
+            height: 2px;
+            background: #111;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border-radius: 2px;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--primary);
+            box-shadow: 0 0 15px var(--primary);
+            transition: width 0.15s linear;
+        }
+
+        /* --- UI STYLING --- */
         .auth-container { height: 100vh; display: flex; justify-content: center; align-items: center; flex-direction: column; }
         .auth-card { background: var(--card-bg); padding: 40px; border: 1px solid #222; width: 320px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--primary); text-align: center; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; font-weight: bold; margin-top: 5px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; background: #000; border: 1px solid #333; color: var(--primary); text-align: center; box-sizing: border-box; font-family: monospace; }
+        button { width: 100%; padding: 12px; background: transparent; border: 1px solid var(--primary); color: var(--primary); cursor: pointer; transition: 0.3s; font-weight: bold; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
         button:hover { background: var(--primary); color: #000; box-shadow: 0 0 15px var(--primary); }
 
         #home-page { height: 100vh; display: flex; flex-direction: column; background: #080808; }
-        header { display: flex; justify-content: space-between; padding: 15px 25px; background: #000; border-bottom: 1px solid #1a1a1a; }
+        header { display: flex; justify-content: space-between; padding: 15px 25px; background: #000; border-bottom: 1px solid #1a1a1a; z-index: 10; }
         
         #side-menu { position: fixed; right: -260px; top: 0; width: 240px; height: 100%; background: #0f0f0f; border-left: 1px solid #333; padding-top: 60px; transition: 0.3s; z-index: 100; }
         #side-menu.active { right: 0; }
-        .menu-item { padding: 15px 25px; border-bottom: 1px solid #222; cursor: pointer; }
+        .menu-item { padding: 15px 25px; border-bottom: 1px solid #222; cursor: pointer; color: #888; transition: 0.2s; }
         .menu-item:hover { background: #1a1a1a; color: var(--primary); }
 
         .viewport { flex-grow: 1; padding: 40px; overflow-y: auto; display: flex; justify-content: center; }
-        .content-card { background: #0c0c0c; width: 100%; max-width: 850px; padding: 40px; border: 1px solid #111; line-height: 1.6; }
+        .content-card { background: #0c0c0c; width: 100%; max-width: 850px; padding: 40px; border: 1px solid #111; line-height: 1.6; position: relative; }
 
         .flow-box { border: 2px solid var(--primary); padding: 15px; margin: 10px; text-align: center; font-weight: bold; }
         .hacking-doc { background: #000; border-left: 4px solid var(--danger); padding: 20px; font-family: monospace; color: var(--success); }
@@ -82,12 +114,22 @@
 <body>
 
     <audio id="boot-sound" src="https://codeskulptor-demos.commondatastorage.googleapis.com/pang/arrow.mp3" preload="auto"></audio>
-    <div id="cinematic-container"><div id="hero-butterfly">🦋</div></div>
+
+    <div id="cinematic-container">
+        <div id="hero-butterfly">🦋</div>
+        <div class="loading-wrapper">
+            <div id="load-count">0%</div>
+            <div class="progress-track">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <div style="font-size: 10px; color: #444; margin-top: 8px; letter-spacing: 2px;">INITIALIZING SECURE KERNEL...</div>
+        </div>
+    </div>
 
     <div id="page-1" class="auth-container">
         <div style="font-size: 80px; filter: drop-shadow(0 0 15px var(--primary));">🦋</div>
-        <h1 style="letter-spacing: 5px; margin-top: 20px;">BUTTERFLY GANG</h1>
-        <button onclick="showPage(2)" style="width: 200px; margin-top: 20px;">INITIALIZE KERNEL</button>
+        <h1 style="letter-spacing: 8px; margin-top: 20px;">BUTTERFLY GANG</h1>
+        <button onclick="showPage(2)" style="width: 220px; margin-top: 20px;">INITIALIZE BOOT</button>
     </div>
 
     <div id="page-2" class="auth-container hidden">
@@ -96,7 +138,7 @@
             <input type="email" id="user-email" placeholder="OPERATIVE EMAIL">
             <input type="password" id="user-pass" placeholder="SECURITY KEY">
             <button onclick="handleLogin()">AUTHORIZE LOGIN</button>
-            <button onclick="handleSignup()" style="border-color: #555; color: #888; font-size: 11px;">REGISTER NEW OPERATIVE</button>
+            <button onclick="handleSignup()" style="border-color: #333; color: #666; font-size: 10px; margin-top: 15px;">NEW OPERATIVE REGISTRATION</button>
         </div>
     </div>
 
@@ -118,14 +160,14 @@
         <div class="viewport">
             <div id="main-content" class="content-card">
                 <h1>Welcome back, Operative.</h1>
-                <p>Status: <span style="color:var(--success)">Online / Cloud Authenticated</span></p>
-                <p style="margin-top: 20px; color: #888;">> Authentication successful. Secure directory unlocked.</p>
+                <p>Status: <span style="color:var(--success)">Online / Cloud Mesh Active</span></p>
+                <p style="margin-top: 20px; color: #888;">> System Ready. Select a directory to begin.</p>
             </div>
         </div>
     </div>
 
     <script>
-        // --- SUPABASE CONFIG ---
+        // --- YOUR UNIQUE CLOUD CONFIG ---
         const SUPABASE_URL = 'https://jlafjoxokkrwxxvlebxr.supabase.co'; 
         const SUPABASE_KEY = 'sb_publishable_aRtqKsywWZDkHTI_asvNgQ_2UsnKICV';
         const supabase_client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -133,13 +175,14 @@
         let failedAttempts = 0;
         let isLocked = false;
 
-        // AUTH LOGIC
+        // AUTHENTICATION
         async function handleSignup() {
             const email = document.getElementById('user-email').value;
             const password = document.getElementById('user-pass').value;
+            if(!email || !password) return alert("Credentials required.");
             const { data, error } = await supabase_client.auth.signUp({ email, password });
-            if (error) alert("ERROR: " + error.message);
-            else alert("OPERATIVE REGISTERED. You can now login.");
+            if (error) alert("REGISTRATION FAILED: " + error.message);
+            else alert("OPERATIVE REGISTERED. Use your key to login.");
         }
 
         async function handleLogin() {
@@ -148,6 +191,32 @@
             const { data, error } = await supabase_client.auth.signInWithPassword({ email, password });
             if (error) alert("ACCESS DENIED: " + error.message);
             else startCinematic();
+        }
+
+        // CINEMATIC LOADER
+        function startCinematic() {
+            const sound = document.getElementById('boot-sound');
+            if(sound) sound.play().catch(() => {});
+
+            const container = document.getElementById('cinematic-container');
+            const bfly = document.getElementById('hero-butterfly');
+            const loadText = document.getElementById('load-count');
+            const loadFill = document.getElementById('progress-fill');
+            
+            document.getElementById('page-2').classList.add('hidden');
+            container.style.display = 'flex';
+            bfly.classList.add('executing-animation');
+
+            let count = 0;
+            const timer = setInterval(() => {
+                count++;
+                loadText.innerText = count + "%";
+                loadFill.style.width = count + "%";
+                if (count >= 100) {
+                    clearInterval(timer);
+                    setTimeout(() => { container.style.display = 'none'; showPage(3); }, 800);
+                }
+            }, 150); // Counts to 100 over 15 seconds
         }
 
         // NAVIGATION
@@ -163,18 +232,7 @@
 
         function toggleMenu() { document.getElementById('side-menu').classList.toggle('active'); }
 
-        function startCinematic() {
-            const sound = document.getElementById('boot-sound');
-            if(sound) sound.play().catch(() => {});
-            const container = document.getElementById('cinematic-container');
-            const bfly = document.getElementById('hero-butterfly');
-            document.getElementById('page-2').classList.add('hidden');
-            container.style.display = 'block';
-            bfly.classList.add('executing-animation');
-            setTimeout(() => { container.style.display = 'none'; showPage(3); }, 20000);
-        }
-
-        // VAULT LOGIC
+        // VAULT & RENDERING
         function accessPrivate() {
             if(isLocked) {
                 let master = prompt("CRITICAL LOCKOUT. Enter Master Key:");
@@ -190,15 +248,14 @@
             }
         }
 
-        // CONTENT RENDERING
         function renderContent(type) {
             const display = document.getElementById('main-content');
             if(document.getElementById('side-menu').classList.contains('active')) toggleMenu();
 
             if(type === 'account') {
                 display.innerHTML = `<h2>Personnel Dossier: Ansh</h2>
-                <p><strong>Registry:</strong> Lead Architect | <strong>Class:</strong> 11 PCM | <strong>Location:</strong> Meerut</p>
-                <p style="font-size:14px; color:#aaa; text-align:justify;">This profile serves as the cornerstone of the Butterfly Gang’s digital infrastructure. As a high-level administrator within the 11th Sector, the user designated as "Ansh" controls the flow of encrypted data across the sub-mesh. Identity confirmed via cloud kernel.</p>`;
+                <p><strong>Registry:</strong> Lead Architect | <strong>Status:</strong> Cloud Verified</p>
+                <p style="font-size:14px; color:#aaa; text-align:justify;">Identity confirmed via jlafjoxokkrwxxvlebxr kernel. Sovereign digital infrastructure active.</p>`;
             } 
             else if(type === 'course') {
                 display.innerHTML = `<h2>Infiltration Lifecycle</h2>
@@ -213,12 +270,11 @@
                     <p># TARGET: Global Centralized Databases</p>
                     <p>1. Initialize stealth tunnel via port 443.</p>
                     <p>2. Execute buffer overflow at 0xBF992.</p>
-                    <p>3. Bypass auth using logic injection.</p>
+                    <p>3. Bypass auth using cloud logic injection.</p>
                 </div>`;
             }
             else if(type === 'private') {
                 display.innerHTML = `<h2 style="color:var(--danger)">DECRYPTED VAULT</h2>
-                <p>ACCESS KEY: ansh1234 [VERIFIED]</p>
                 <div style="background:#1a0000; padding:20px; border:1px solid var(--danger);">
                     <p>📄 ROOT_ACCESS_KEYS.txt</p>
                     <p>📄 PYTHON_ZERO_DAY_EXPLOIT.py</p>
@@ -226,12 +282,12 @@
                 </div>`;
             }
             else if(type === 'network') {
-                display.innerHTML = `<h2>Cloud Sync Control</h2>
-                <p>Uplink Target: Active Cloud Database</p>
-                <button onclick="alert('Synchronizing local buffers to Supabase Cloud...')">CHECK UPLINK</button>`;
+                display.innerHTML = `<h2>Cloud Sync</h2>
+                <p>Uplink: Synchronized with Supabase Database.</p>
+                <button onclick="alert('Buffers synced.')">SYNC NOW</button>`;
             }
         }
     </script>
 </body>
-                </html>
-                
+    </html>
+    
